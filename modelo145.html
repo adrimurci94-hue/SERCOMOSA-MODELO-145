@@ -351,10 +351,24 @@ function addHijo(){
   <div class="row3">
     <div class="field"><label>Año de nacimiento</label><input type="number" id="h${id}_nac" placeholder="2010" min="1999" max="2025"></div>
     <div class="field"><label>Año adopción/acogimiento</label><input type="number" id="h${id}_adop" placeholder="(si aplica)"><div class="note">Solo para adoptados o acogidos</div></div>
-    <div class="field"><label>Discapacidad</label><select id="h${id}_disc"><option value="0">Sin discapacidad</option><option value="33">≥33% e &lt;65%</option><option value="65">≥65%</option></select></div>
+    <div class="field"><label>Discapacidad</label><select id="h${id}_disc" onchange="toggleDiscapHijo(${id})"><option value="0">Sin discapacidad</option><option value="33">≥33% e &lt;65%</option><option value="65">≥65%</option></select></div>
+  </div>
+  <div id="cr-h${id}-ayuda-div" style="display:none">
+    <div class="check-row" id="cr-h${id}-ayuda" onclick="toggleCheck('h${id}_ayuda','cr-h${id}-ayuda')"><input type="checkbox" id="h${id}_ayuda"><div class="check-text">Además, tiene acreditada la necesidad de ayuda de terceras personas o movilidad reducida</div></div>
   </div>
   <div class="check-row" id="cr-h${id}-excl" onclick="toggleCheck('h${id}_excl','cr-h${id}-excl')"><input type="checkbox" id="h${id}_excl"><div class="check-text">Convive <strong>únicamente</strong> conmigo, sin convivir también con el otro progenitor</div></div>`;
   document.getElementById('hijos-container').appendChild(d);
+}
+function toggleDiscapHijo(id){
+  const disc = document.getElementById('h'+id+'_disc').value;
+  const div  = document.getElementById('cr-h'+id+'-ayuda-div');
+  if(div) div.style.display = disc !== '0' ? 'block' : 'none';
+  if(disc === '0'){
+    const cb = document.getElementById('h'+id+'_ayuda');
+    if(cb) cb.checked = false;
+    const cr = document.getElementById('cr-h'+id+'-ayuda');
+    if(cr) cr.classList.remove('checked');
+  }
 }
 function removeHijo(id){const el=document.getElementById('hijo-'+id);if(el)el.remove();if(!document.querySelector('#hijos-container .person-card')){document.getElementById('hijos-empty').style.display='block';hijosCount=0;}}
 function addAsc(){
@@ -373,7 +387,7 @@ function removeAsc(id){const el=document.getElementById('asc-'+id);if(el)el.remo
 function checkDeclaracion(){const ok=document.getElementById('declara').checked;const btn=document.getElementById('btn-enviar');btn.disabled=!ok;btn.style.opacity=ok?'1':'0.4';btn.style.cursor=ok?'pointer':'not-allowed';document.getElementById('cr-declara').classList.toggle('checked',ok);}
 function getFormData(){
   const sf=document.querySelector('input[name=sit_fam]:checked');
-  const hijos=[];document.querySelectorAll('[id^=hijo-]').forEach(h=>{const n=h.id.split('-')[1];hijos.push({nac:document.getElementById('h'+n+'_nac')?.value||'',adop:document.getElementById('h'+n+'_adop')?.value||'',disc:document.getElementById('h'+n+'_disc')?.value||'0',excl:document.getElementById('h'+n+'_excl')?.checked||false});});
+  const hijos=[];document.querySelectorAll('[id^=hijo-]').forEach(h=>{const n=h.id.split('-')[1];hijos.push({nac:document.getElementById('h'+n+'_nac')?.value||'',adop:document.getElementById('h'+n+'_adop')?.value||'',disc:document.getElementById('h'+n+'_disc')?.value||'0',ayuda:document.getElementById('h'+n+'_ayuda')?.checked||false,excl:document.getElementById('h'+n+'_excl')?.checked||false});});
   const ascs=[];document.querySelectorAll('[id^=asc-]').forEach(a=>{const n=a.id.split('-')[1];ascs.push({nac:document.getElementById('a'+n+'_nac')?.value||'',disc:document.getElementById('a'+n+'_disc')?.value||'0',otros:document.getElementById('a'+n+'_otros')?.value||''});});
   return{
     fecha_registro:new Date().toISOString().slice(0,10),
