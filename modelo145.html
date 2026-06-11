@@ -140,7 +140,8 @@
         <div class="field"><label>NIF / NIE *</label><input type="text" id="nif" placeholder="12345678A" maxlength="9"><div class="note">8 dígitos + letra (DNI) o X/Y/Z + dígitos + letra (NIE)</div></div>
         <div class="field"><label>Año de nacimiento *</label><input type="number" id="anio_nac" placeholder="1985" min="1930" max="2006"><div class="note">Necesario para calcular el mínimo personal</div></div>
       </div>
-      <div class="field"><label>Apellidos y Nombre *</label><input type="text" id="nombre" placeholder="García López, Ana"><div class="note">Como aparece en el DNI: primero apellidos, luego nombre</div></div>
+      <div class="field"><label>Apellidos *</label><input type="text" id="apellidos" placeholder="García López"><div class="note">Primer y segundo apellido como aparecen en el DNI</div></div>
+      <div class="field"><label>Nombre *</label><input type="text" id="nombre" placeholder="Ana"><div class="note">Nombre de pila como aparece en el DNI</div></div>
     </div>
     <div class="card">
       <div class="sec-title">🗺️ Movilidad geográfica</div>
@@ -376,7 +377,9 @@ function getFormData(){
   return{
     fecha_registro:new Date().toISOString().slice(0,10),
     nif:document.getElementById('nif').value.trim().toUpperCase(),
-    nombre:document.getElementById('nombre').value.trim(),
+    nombre:(document.getElementById('apellidos').value.trim() + ', ' + document.getElementById('nombre').value.trim()).toUpperCase(),
+    apellidos:document.getElementById('apellidos').value.trim().toUpperCase(),
+    nombre_pila:document.getElementById('nombre').value.trim().toUpperCase(),
     anio_nac:document.getElementById('anio_nac').value,
     sit_familiar:sf?sf.value:'3',
     nif_conyuge:document.getElementById('nif_conyuge').value.trim().toUpperCase()||null,
@@ -402,7 +405,8 @@ function buildSummary(){
   document.getElementById('summary-content').innerHTML=`
     <div class="summary-card"><div class="lbl">NIF/NIE</div><div class="val">${d.nif||'—'}</div></div>
     <div class="summary-card"><div class="lbl">Nombre</div><div class="val">${d.nombre||'—'}</div></div>
-    <div class="summary-card"><div class="lbl">Año nacimiento</div><div class="val">${d.anio_nac||'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Apellidos</div><div class="val">${d.apellidos||'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Nombre</div><div class="val">${d.nombre_pila||'—'}</div></div>
     <div class="summary-card"><div class="lbl">Situación familiar</div><div class="val">${sfL[d.sit_familiar]||'—'}</div></div>
     <div class="summary-card"><div class="lbl">Discapacidad</div><div class="val">${dL[d.discapacidad]}${d.discap_mov?' + movilidad reducida':''}</div></div>
     <div class="summary-card"><div class="lbl">Movilidad geográfica</div><div class="val">${d.movilidad?'Sí — '+(d.movilidad_fecha||'sin fecha'):'No'}</div></div>
@@ -415,7 +419,9 @@ function buildSummary(){
 }
 async function enviarFormulario(){
   const d=getFormData();
-  if(!d.nif||!d.nombre){alert('Por favor, completa al menos el NIF y el nombre.');return;}
+  if(!d.nif||!document.getElementById('apellidos').value.trim()||!document.getElementById('nombre').value.trim()){
+    alert('Por favor, completa al menos el NIF, apellidos y nombre.');return;
+  }
   document.getElementById('send-error').classList.remove('show');
   document.getElementById('sending-overlay').classList.add('show');
   document.getElementById('btn-enviar').disabled=true;
