@@ -298,11 +298,13 @@ function renderTable(data){
   document.getElementById('empty-state').style.display='none';
   document.getElementById('main-table').style.display='table';
   const sfBadge = n=>n==='1'?'badge-amber':n==='2'?'badge-green':'badge-blue';
-  document.getElementById('table-body').innerHTML = data.map(w=>`<tr>
+  document.getElementById('table-body').innerHTML = data.map(w=>{
+    const hijosV = (w.hijos||[]).filter(h=>h.nac).length;
+    return `<tr>
     <td><strong>${w.nombre||'—'}</strong></td>
     <td class="muted">${w.nif||'—'}</td>
     <td><span class="badge ${sfBadge(w.sit_familiar)}">${sfL[w.sit_familiar]||'—'}</span></td>
-    <td class="muted">${(w.hijos||[]).length||'—'}</td>
+    <td class="muted">${hijosV||'—'}</td>
     <td>${w.retencion_voluntaria==='si'?`<span class="badge badge-amber">${w.pct_retencion}%</span>`:'<span class="muted">—</span>'}</td>
     <td class="muted">${dL[w.discapacidad]||'—'}</td>
     <td class="muted">${w.fecha_registro||'—'}</td>
@@ -310,7 +312,7 @@ function renderTable(data){
       <button class="btn-tbl" onclick="openDetail(${w.id})">👁 Ver</button>
       <button class="btn-tbl btn-tbl-red" onclick="deleteOne(${w.id})">🗑</button>
     </div></td>
-  </tr>`).join('');
+  </tr>`;}).join('');
 }
 
 // ===== DETAIL =====
@@ -321,12 +323,14 @@ function openDetail(id){
   document.getElementById('detail-title').textContent = '📄 '+w.nombre;
   const sfFull={'1':'Opción 1 — Familia monoparental','2':'Opción 2 — Cónyuge con rentas bajas','3':'Opción 3 — Resto de situaciones'};
   let hijosHtml='<div style="font-size:13px;color:var(--text3)">Ninguno declarado</div>';
-  if((w.hijos||[]).length>0){
-    hijosHtml='<div class="detail-grid">'+w.hijos.map((h,i)=>`<div class="detail-card"><div class="dlbl">Descendiente ${i+1}</div><div class="dval">Nacido: ${h.nac||'—'}${h.adop?' · Adopción: '+h.adop:''} · Discap: ${dL[h.disc]||'—'}${h.excl?' · Custodia exclusiva':''}</div></div>`).join('')+'</div>';
+  const hijosValidos = (w.hijos||[]).filter(h=>h.nac);
+  if(hijosValidos.length>0){
+    hijosHtml='<div class="detail-grid">'+hijosValidos.map((h,i)=>`<div class="detail-card"><div class="dlbl">Descendiente ${i+1}</div><div class="dval">Nacido: ${h.nac}${h.adop?' · Adopción: '+h.adop:''} · Discap: ${dL[h.disc]||'—'}${h.excl?' · Custodia exclusiva':''}</div></div>`).join('')+'</div>';
   }
   let ascHtml='<div style="font-size:13px;color:var(--text3)">Ninguno declarado</div>';
-  if((w.ascendientes||[]).length>0){
-    ascHtml='<div class="detail-grid">'+w.ascendientes.map((a,i)=>`<div class="detail-card"><div class="dlbl">Ascendiente ${i+1}</div><div class="dval">Nacido: ${a.nac||'—'} · Discap: ${dL[a.disc]||'—'}${a.otros?' · Convivientes: '+a.otros:''}</div></div>`).join('')+'</div>';
+  const ascsValidos = (w.ascendientes||[]).filter(a=>a.nac).slice(0,2);
+  if(ascsValidos.length>0){
+    ascHtml='<div class="detail-grid">'+ascsValidos.map((a,i)=>`<div class="detail-card"><div class="dlbl">Ascendiente ${i+1}</div><div class="dval">Nacido: ${a.nac} · Discap: ${dL[a.disc]||'—'}${a.otros?' · Convivientes: '+a.otros:''}</div></div>`).join('')+'</div>';
   }
   document.getElementById('detail-body').innerHTML=`
     <div class="section-sep">👤 Datos personales</div>

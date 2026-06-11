@@ -276,7 +276,7 @@
         <div class="info-box"><span class="ico">ℹ️</span><div>Al confirmar, manifiestas que eres contribuyente del IRPF y que los datos son ciertos, conforme al Art. 88 del Reglamento del IRPF.</div></div>
         <div class="error-box" id="send-error">❌ Error al enviar los datos. Comprueba tu conexión e inténtalo de nuevo.</div>
         <div class="check-row" id="cr-declara" onclick="toggleCheck('declara','cr-declara');checkDeclaracion()"><input type="checkbox" id="declara"><div class="check-text"><strong>Declaro que soy contribuyente del IRPF y que los datos comunicados son ciertos.</strong></div></div>
-        <div class="field"><label>Fecha de la comunicación</label><input type="date" id="fecha_firma"></div>
+        <div class="field"><label>Fecha de la comunicación</label><input type="date" id="fecha_firma" readonly style="background:#f5f5f3;cursor:not-allowed;color:var(--text2)"><div class="note">Fecha generada automáticamente — no modificable</div></div>
         <button class="btn-next" id="btn-enviar" style="width:100%;opacity:0.4;cursor:not-allowed" disabled onclick="enviarFormulario()">📨 Confirmar y enviar a Recursos Humanos</button>
       </div>
       <div class="nav"><button class="btn-back" onclick="goTab(6)">← Anterior</button><span></span></div>
