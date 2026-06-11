@@ -216,8 +216,8 @@
       <div class="info-box"><span class="ico">ℹ️</span><div>Si pagas pensión a tu ex-cónyuge o manutención a tus hijos <strong>por sentencia judicial firme</strong>, estos importes reducen tu retención. Los importes son <em>anuales</em>.</div></div>
       <div class="sec-title">⚖️ Obligaciones fijadas judicialmente</div>
       <div class="row2">
-        <div class="field"><label>Pensión compensatoria al cónyuge (€/año)</label><input type="number" id="pension_conyuge" placeholder="0,00" min="0" step="0.01"><div class="note">Deja en blanco si no aplica</div></div>
-        <div class="field"><label>Anualidades por alimentos a hijos (€/año)</label><input type="number" id="anualidades_hijos" placeholder="0,00" min="0" step="0.01"><div class="note">Deja en blanco si no aplica</div></div>
+        <div class="field"><label>Pensión compensatoria al cónyuge (€/año)</label><input type="text" id="pension_conyuge" placeholder="Ej: 1.200,00" oninput="formatImporte(this)"><div class="note">Deja en blanco si no aplica</div></div>
+        <div class="field"><label>Anualidades por alimentos a hijos (€/año)</label><input type="text" id="anualidades_hijos" placeholder="Ej: 3.600,00" oninput="formatImporte(this)"><div class="note">Deja en blanco si no aplica</div></div>
       </div>
       <div class="warn-box"><span class="ico">⚠️</span><div>Solo importes fijados por resolución judicial firme.</div></div>
     </div>
@@ -256,12 +256,6 @@
             <span style="font-size:13px;color:var(--text3)">O introduce el porcentaje exacto:</span>
             <input type="number" id="pct-manual" min="2" max="45" value="20" step="0.1" style="width:90px;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;font-family:inherit" oninput="updateManual()">%
           </div>
-        </div>
-        <div class="example-table">
-          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Ejemplo orientativo con salario bruto de 30.000 €/año</div>
-          <div class="example-row"><span style="color:var(--text2)">Salario bruto mensual</span><span>2.500,00 €</span></div>
-          <div class="example-row"><span style="color:var(--text2)">Retención (<span id="ex-pct">20</span>%)</span><span style="color:var(--red)">– <span id="ex-retenc">500,00</span> €</span></div>
-          <div class="example-row"><span>Neto a cobrar</span><span style="color:var(--green)"><span id="ex-neto">2.000,00</span> €</span></div>
         </div>
       </div>
     </div>
@@ -308,6 +302,7 @@
 // ===== SUPABASE CONFIG =====
 const SUPABASE_URL = 'https://ygmsyilgdyzhthnioapo.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnbXN5aWxnZHl6aHRobmlvYXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzI3NTMsImV4cCI6MjA5NjcwODc1M30.eM1-z1dhwVHttrTu2KG5NGHyC2i_8DFG1-bIHxfiXuw';
+const PDF_SERVER_URL = 'https://modelo145-servidor.onrender.com';
 
 async function insertRecord(data) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/modelo145`, {
@@ -361,6 +356,7 @@ function addHijo(){
 }
 function removeHijo(id){const el=document.getElementById('hijo-'+id);if(el)el.remove();if(!document.querySelector('#hijos-container .person-card')){document.getElementById('hijos-empty').style.display='block';hijosCount=0;}}
 function addAsc(){
+  if(ascCount>=2){alert('Máximo 2 ascendientes en este formulario.');return;}
   const id=++ascCount;document.getElementById('asc-empty').style.display='none';
   const d=document.createElement('div');d.className='person-card';d.id='asc-'+id;
   d.innerHTML=`<div class="person-card-header"><span class="person-card-title">👴 Ascendiente ${id}</span><button class="btn-remove" onclick="removeAsc(${id})">🗑 Eliminar</button></div>
@@ -391,8 +387,8 @@ function getFormData(){
     rend_irr:document.getElementById('rend_irr').checked,
     hijos:hijos,
     ascendientes:ascs,
-    pension_conyuge:parseFloat(document.getElementById('pension_conyuge').value)||0,
-    anualidades_hijos:parseFloat(document.getElementById('anualidades_hijos').value)||0,
+    pension_conyuge:parseImporte(document.getElementById('pension_conyuge').value),
+    anualidades_hijos:parseImporte(document.getElementById('anualidades_hijos').value),
     deduccion_vivienda:document.getElementById('deduccion_vivienda').checked,
     retencion_voluntaria:document.getElementById('rv-radio-si').checked?'si':'no',
     pct_retencion:document.getElementById('rv-radio-si').checked?parseFloat(document.getElementById('pct-manual').value)||20:null,
@@ -435,17 +431,36 @@ async function enviarFormulario(){
     console.error(e);
   }
 }
-function generarPDF(){
+async function generarPDF(){
   const d = getFormData();
   if(!d.nif||!d.nombre){alert('No hay datos para generar el PDF.');return;}
 
-  // Usar jsPDF desde CDN
-  if(typeof window.jspdf === 'undefined'){
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    s.onload=()=>_generarPDFInterno(d);
-    document.head.appendChild(s);
-  } else { _generarPDFInterno(d); }
+  const btn = document.querySelector('.btn-print');
+  const textoOriginal = btn.innerHTML;
+  btn.innerHTML = '⏳ Generando...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${PDF_SERVER_URL}/generar-pdf-trabajador`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(d)
+    });
+    if(!res.ok) throw new Error('Error en el servidor');
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `Modelo145_${d.nif}_trabajador.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.innerHTML = '✅ Descargado';
+    setTimeout(()=>{ btn.innerHTML = textoOriginal; btn.disabled = false; }, 2500);
+  } catch(e) {
+    alert('❌ Error al generar el PDF.\n\nEl servidor puede estar arrancando (espera 30 segundos e inténtalo de nuevo).');
+    btn.innerHTML = textoOriginal;
+    btn.disabled = false;
+  }
 }
 
 function _generarPDFInterno(d){
@@ -637,6 +652,24 @@ function _generarPDFInterno(d){
   doc.text('Documento generado electrónicamente — Modelo 145 IRPF',ml,y);
 
   doc.save(`Modelo145_${d.nif}_${d.fecha_firma||new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+function formatImporte(input){
+  // Permitir solo dígitos, puntos y comas
+  let val = input.value.replace(/[^\d.,]/g,'');
+  // Separar parte entera y decimal
+  let partes = val.replace(/\./g,'').split(',');
+  let entera = partes[0] || '';
+  let decimal = partes[1] !== undefined ? partes[1].slice(0,2) : null;
+  // Añadir separador de miles con punto
+  entera = entera.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  input.value = decimal !== null ? entera + ',' + decimal : entera;
+}
+
+function parseImporte(str){
+  if(!str) return 0;
+  // Eliminar puntos de miles y reemplazar coma decimal por punto
+  return parseFloat(str.replace(/\./g,'').replace(',','.')) || 0;
 }
 
 function compartirWhatsApp(){
