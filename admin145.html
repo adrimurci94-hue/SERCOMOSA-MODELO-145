@@ -335,20 +335,20 @@ function openDetail(id){
   document.getElementById('detail-body').innerHTML=`
     <div class="section-sep">👤 Datos personales</div>
     <div class="detail-grid">
-      <div class="detail-card"><div class="dlbl">Nombre completo</div><div class="dval">${w.nombre||'—'}</div></div>
-      <div class="detail-card"><div class="dlbl">NIF / NIE</div><div class="dval">${w.nif||'—'}</div></div>
+      <div class="detail-card"><div class="dlbl">Nombre completo</div><div class="dval">${(w.nombre||'—').toUpperCase()}</div></div>
+      <div class="detail-card"><div class="dlbl">NIF / NIE</div><div class="dval">${(w.nif||'—').toUpperCase()}</div></div>
       <div class="detail-card"><div class="dlbl">Año de nacimiento</div><div class="dval">${w.anio_nac||'—'}</div></div>
       <div class="detail-card"><div class="dlbl">Fecha comunicación</div><div class="dval">${w.fecha_firma||w.fecha_registro||'—'}</div></div>
     </div>
     <div class="section-sep">👨‍👩‍👧 Situación familiar y discapacidad</div>
     <div class="detail-grid">
       <div class="detail-card"><div class="dlbl">Situación familiar</div><div class="dval">${sfFull[w.sit_familiar]||'—'}</div></div>
-      ${w.sit_familiar==='2'?`<div class="detail-card"><div class="dlbl">NIF del cónyuge</div><div class="dval">${w.nif_conyuge||'—'}</div></div>`:''}
-      <div class="detail-card"><div class="dlbl">Discapacidad propia</div><div class="dval">${dL[w.discapacidad]||'—'}${w.discap_mov?' + movilidad reducida':''}</div></div>
+      ${w.sit_familiar==='2'?`<div class="detail-card"><div class="dlbl">NIF del cónyuge</div><div class="dval">${(w.nif_conyuge||'—').toUpperCase()}</div></div>`:''}
+      <div class="detail-card"><div class="dlbl">Discapacidad propia</div><div class="dval">${dL[w.discapacidad]||'—'}${w.discap_mov?' + necesidad ayuda terceras personas':''}</div></div>
       <div class="detail-card"><div class="dlbl">Movilidad geográfica</div><div class="dval">${w.movilidad?'Sí — '+(w.movilidad_fecha||'sin fecha'):'No'}</div></div>
     </div>
-    <div class="section-sep">👶 Descendientes (${(w.hijos||[]).length})</div>${hijosHtml}
-    <div class="section-sep">👴 Ascendientes (${(w.ascendientes||[]).length})</div>${ascHtml}
+    <div class="section-sep">👶 Descendientes (${(w.hijos||[]).filter(h=>h.nac).length})</div>${hijosHtml}
+    <div class="section-sep">👴 Ascendientes (${ascsValidos.length})</div>${ascHtml}
     <div class="section-sep">⚖️ Pensiones y deducciones</div>
     <div class="detail-grid">
       <div class="detail-card"><div class="dlbl">Pensión compensatoria</div><div class="dval">${parseFloat(w.pension_conyuge||0)>0?parseFloat(w.pension_conyuge).toFixed(2)+' €/año':'—'}</div></div>
