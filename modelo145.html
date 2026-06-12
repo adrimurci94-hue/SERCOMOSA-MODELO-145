@@ -370,9 +370,20 @@ function toggleDiscapHijo(id){
     if(cr) cr.classList.remove('checked');
   }
 }
-function removeHijo(id){const el=document.getElementById('hijo-'+id);if(el)el.remove();if(!document.querySelector('#hijos-container .person-card')){document.getElementById('hijos-empty').style.display='block';hijosCount=0;}}
+function removeHijo(id){
+  const el=document.getElementById('hijo-'+id);
+  if(el)el.remove();
+  const remaining=document.querySelectorAll('#hijos-container .person-card');
+  if(remaining.length===0){
+    document.getElementById('hijos-empty').style.display='block';
+    hijosCount=0;
+  } else {
+    hijosCount=remaining.length;
+  }
+}
 function addAsc(){
-  if(ascCount>=2){alert('Máximo 2 ascendientes en este formulario.');return;}
+  const existing=document.querySelectorAll('#asc-container .person-card').length;
+  if(existing>=2){alert('Máximo 2 ascendientes en este formulario.');return;}
   const id=++ascCount;document.getElementById('asc-empty').style.display='none';
   const d=document.createElement('div');d.className='person-card';d.id='asc-'+id;
   d.innerHTML=`<div class="person-card-header"><span class="person-card-title">👴 Ascendiente ${id}</span><button class="btn-remove" onclick="removeAsc(${id})">🗑 Eliminar</button></div>
@@ -383,7 +394,17 @@ function addAsc(){
   </div>`;
   document.getElementById('asc-container').appendChild(d);
 }
-function removeAsc(id){const el=document.getElementById('asc-'+id);if(el)el.remove();if(!document.querySelector('#asc-container .person-card')){document.getElementById('asc-empty').style.display='block';ascCount=0;}}
+function removeAsc(id){
+  const el=document.getElementById('asc-'+id);
+  if(el)el.remove();
+  const remaining=document.querySelectorAll('#asc-container .person-card');
+  if(remaining.length===0){
+    document.getElementById('asc-empty').style.display='block';
+    ascCount=0;
+  } else {
+    ascCount=remaining.length;
+  }
+}
 function checkDeclaracion(){const ok=document.getElementById('declara').checked;const btn=document.getElementById('btn-enviar');btn.disabled=!ok;btn.style.opacity=ok?'1':'0.4';btn.style.cursor=ok?'pointer':'not-allowed';document.getElementById('cr-declara').classList.toggle('checked',ok);}
 function getFormData(){
   const sf=document.querySelector('input[name=sit_fam]:checked');
@@ -432,7 +453,7 @@ function buildSummary(){
     <div class="summary-card"><div class="lbl">Discapacidad</div><div class="val">${dL[d.discapacidad]}${d.discap_mov?' + movilidad reducida':''}</div></div>
     <div class="summary-card"><div class="lbl">Movilidad geográfica</div><div class="val">${d.movilidad?'Sí — '+(d.movilidad_fecha||'sin fecha'):'No'}</div></div>
     <div class="summary-card"><div class="lbl">Descendientes</div><div class="val">${d.hijos.length||'Ninguno'}</div></div>
-    <div class="summary-card"><div class="lbl">Ascendientes</div><div class="val">${d.ascendientes.length||'Ninguno'}</div></div>
+    <div class="summary-card"><div class="lbl">Ascendientes</div><div class="val">${d.ascendientes.filter(a=>a.nac).length||'Ninguno'}</div></div>
     <div class="summary-card"><div class="lbl">Pensión al cónyuge</div><div class="val">${d.pension_conyuge>0?d.pension_conyuge.toFixed(2)+' €/año':'—'}</div></div>
     <div class="summary-card"><div class="lbl">Alimentos a hijos</div><div class="val">${d.anualidades_hijos>0?d.anualidades_hijos.toFixed(2)+' €/año':'—'}</div></div>
     <div class="summary-card"><div class="lbl">Deducción vivienda</div><div class="val">${d.deduccion_vivienda?'Sí':'No'}</div></div>
