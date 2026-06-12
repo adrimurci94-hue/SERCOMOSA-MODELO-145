@@ -442,20 +442,29 @@ function getFormData(){
 }
 const sfL={'1':'Monoparental','2':'Cónyuge rentas bajas','3':'Resto / no comunica'};
 const dL={'0':'Sin discapacidad','33':'≥33% e <65%','65':'≥65%'};
+function fmtEuros(v){
+  if(!v||v<=0) return '—';
+  const e=Math.floor(v);
+  const d=Math.round((v-e)*100);
+  return e.toLocaleString('es-ES')+','+(d<10?'0':'')+d+' €/año';
+}
 function buildSummary(){
   const d=getFormData();
+  const hijosValidos = d.hijos.filter(h=>h.nac).length;
+  const ascsValidos  = d.ascendientes.filter(a=>a.nac).length;
   document.getElementById('summary-content').innerHTML=`
     <div class="summary-card"><div class="lbl">NIF/NIE</div><div class="val">${d.nif||'—'}</div></div>
-    <div class="summary-card"><div class="lbl">Nombre</div><div class="val">${d.nombre||'—'}</div></div>
-    <div class="summary-card"><div class="lbl">Apellidos</div><div class="val">${d.apellidos||'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Primer apellido</div><div class="val">${document.getElementById('apellido1').value.toUpperCase()||'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Segundo apellido</div><div class="val">${document.getElementById('apellido2').value.toUpperCase()||'—'}</div></div>
     <div class="summary-card"><div class="lbl">Nombre</div><div class="val">${d.nombre_pila||'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Año de nacimiento</div><div class="val">${d.anio_nac||'—'}</div></div>
     <div class="summary-card"><div class="lbl">Situación familiar</div><div class="val">${sfL[d.sit_familiar]||'—'}</div></div>
-    <div class="summary-card"><div class="lbl">Discapacidad</div><div class="val">${dL[d.discapacidad]}${d.discap_mov?' + movilidad reducida':''}</div></div>
+    <div class="summary-card"><div class="lbl">Discapacidad</div><div class="val">${dL[d.discapacidad]}${d.discap_mov?' + necesidad de ayuda de terceras personas o movilidad reducida':''}</div></div>
     <div class="summary-card"><div class="lbl">Movilidad geográfica</div><div class="val">${d.movilidad?'Sí — '+(d.movilidad_fecha||'sin fecha'):'No'}</div></div>
-    <div class="summary-card"><div class="lbl">Descendientes</div><div class="val">${d.hijos.length||'Ninguno'}</div></div>
-    <div class="summary-card"><div class="lbl">Ascendientes</div><div class="val">${d.ascendientes.filter(a=>a.nac).length||'Ninguno'}</div></div>
-    <div class="summary-card"><div class="lbl">Pensión al cónyuge</div><div class="val">${d.pension_conyuge>0?d.pension_conyuge.toFixed(2)+' €/año':'—'}</div></div>
-    <div class="summary-card"><div class="lbl">Alimentos a hijos</div><div class="val">${d.anualidades_hijos>0?d.anualidades_hijos.toFixed(2)+' €/año':'—'}</div></div>
+    <div class="summary-card"><div class="lbl">Descendientes</div><div class="val">${hijosValidos||'Ninguno'}</div></div>
+    <div class="summary-card"><div class="lbl">Ascendientes</div><div class="val">${ascsValidos||'Ninguno'}</div></div>
+    <div class="summary-card"><div class="lbl">Pensión al cónyuge</div><div class="val">${fmtEuros(d.pension_conyuge)}</div></div>
+    <div class="summary-card"><div class="lbl">Alimentos a hijos</div><div class="val">${fmtEuros(d.anualidades_hijos)}</div></div>
     <div class="summary-card"><div class="lbl">Deducción vivienda</div><div class="val">${d.deduccion_vivienda?'Sí':'No'}</div></div>
     <div class="summary-card"><div class="lbl">Retención voluntaria</div><div class="val">${d.retencion_voluntaria==='si'?'Sí — '+d.pct_retencion+'%':'Solo la calculada'}</div></div>`;
 }
