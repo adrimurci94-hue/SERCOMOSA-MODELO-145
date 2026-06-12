@@ -185,6 +185,7 @@
       <select id="censo-depto" onchange="filterCenso()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">Todos los departamentos</option>
       </select>
+      <button class="btn-action btn-export" onclick="descargarPlantilla()">📥 Descargar plantilla</button>
       <label class="btn-action btn-export" style="cursor:pointer">
         📂 Importar Excel
         <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(this)">
@@ -885,11 +886,20 @@ async function importarExcel(input){
     const LOTE = 50;
     for(let i=0; i<empleados.length; i+=LOTE){
       const lote = empleados.slice(i, i+LOTE);
-      await sbFetch('empleados', {
-        method:'POST',
-        headers:{'Prefer':'resolution=merge-duplicates'},
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/empleados`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
         body: JSON.stringify(lote)
       });
+      if(!res.ok){
+        const err = await res.text();
+        throw new Error(err);
+      }
     }
 
     info.textContent=`✅ ${empleados.length} empleados importados correctamente.`;
@@ -902,7 +912,20 @@ async function importarExcel(input){
   input.value='';
 }
 
-function loadSheetJS(){
+async function descargarPlantilla(){
+  await loadSheetJS();
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['Departamento','Apellido1','Apellido2','Nombre','DNI'],
+    ['ADMINISTRACIÓN','GARCÍA','LÓPEZ','ANA','12345678A'],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  // Anchos de columna
+  ws['!cols'] = [{wch:22},{wch:20},{wch:20},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
+  XLSX.writeFile(wb, 'Plantilla_Empleados_Modelo145.xlsx');
+}
+
   return new Promise((res,rej)=>{
     if(window.XLSX){res();return;}
     const s=document.createElement('script');
