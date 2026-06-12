@@ -926,6 +926,7 @@ async function descargarPlantilla(){
   XLSX.writeFile(wb, 'Plantilla_Empleados_Modelo145.xlsx');
 }
 
+function loadSheetJS(){
   return new Promise((res,rej)=>{
     if(window.XLSX){res();return;}
     const s=document.createElement('script');
