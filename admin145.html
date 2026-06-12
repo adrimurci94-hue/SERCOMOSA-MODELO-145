@@ -702,17 +702,15 @@ async function loadCenso(){
   document.getElementById('censo-table').style.display='none';
   document.getElementById('censo-empty').style.display='none';
   try {
-    // Cargar censo desde Supabase
-    const resC = await sbFetch('empleados?select=*&order=apellido1.asc');
-    censoData = await resC.json();
+    censoData = await sbFetch('empleados?select=*&order=apellido1.asc');
+    if(!Array.isArray(censoData)) censoData = [];
 
-    // Cargar formularios recibidos (para cruzar por DNI)
-    const resF = await sbFetch('modelo145?select=nif,fecha_registro,created_at&order=created_at.asc');
-    const forms = await resF.json();
+    const forms = await sbFetch('modelo145?select=nif,fecha_registro,created_at&order=created_at.asc');
+    const formsArr = Array.isArray(forms) ? forms : [];
 
     // Construir mapa DNI → registros
     censoFormularios = {};
-    forms.forEach(f => {
+    formsArr.forEach(f => {
       const dni = (f.nif||'').toUpperCase();
       if(!censoFormularios[dni]) censoFormularios[dni] = [];
       censoFormularios[dni].push(f);
