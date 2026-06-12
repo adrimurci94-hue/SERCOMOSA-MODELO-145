@@ -149,6 +149,7 @@
       <input class="search-input" type="text" id="search-input" placeholder="🔍 Buscar por nombre o NIF..." oninput="filterTable()">
       <button class="btn-action btn-refresh" onclick="loadData()">🔄 Actualizar</button>
       <button class="btn-action btn-export" onclick="exportCSV()">📊 Exportar CSV</button>
+      <button class="btn-action btn-export" onclick="exportExcel()">📗 Exportar Excel</button>
       <button class="btn-action btn-export" onclick="exportJSON()">📥 Exportar JSON</button>
       <button class="btn-action btn-del-all" onclick="deleteAll()">🗑 Borrar todos</button>
     </div>
@@ -685,7 +686,68 @@ function exportCSV(){
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='modelo145_empleados_'+today+'.csv';a.click();
 }
-// ===== TABS =====
+async function exportExcel(){
+  if(!allData.length){alert('No hay registros para exportar.');return;}
+  await loadSheetJS();
+
+  const sfL2={'1':'Monoparental','2':'Cónyuge renta baja','3':'Estándar'};
+  const dL2={'0':'Sin discapacidad','33':'≥33% e <65%','65':'≥65%'};
+
+  // Cabeceras
+  const headers = [
+    'ID','NIF','Apellidos y Nombre','Año nacimiento','Situación familiar',
+    'NIF cónyuge','Discapacidad','Ayuda terceras personas','Movilidad geográfica',
+    'Fecha traslado','Rendimientos irregulares','Nº descendientes','Nº ascendientes',
+    'Pensión cónyuge (€)','Anualidades hijos (€)','Deducción vivienda',
+    'Retención voluntaria','% Retención','Fecha comunicación','Fecha registro'
+  ];
+
+  const rows = allData.map(w => [
+    w.id,
+    (w.nif||'').toUpperCase(),
+    (w.nombre||'').toUpperCase(),
+    w.anio_nac||'',
+    sfL2[w.sit_familiar]||'',
+    (w.nif_conyuge||'').toUpperCase(),
+    dL2[w.discapacidad]||'Sin discapacidad',
+    w.discap_mov ? 'SÍ' : 'NO',
+    w.movilidad ? 'SÍ' : 'NO',
+    w.movilidad_fecha||'',
+    w.rend_irr ? 'SÍ' : 'NO',
+    (w.hijos||[]).filter(h=>h.nac).length,
+    (w.ascendientes||[]).filter(a=>a.nac).length,
+    parseFloat(w.pension_conyuge||0),
+    parseFloat(w.anualidades_hijos||0),
+    w.deduccion_vivienda ? 'SÍ' : 'NO',
+    w.retencion_voluntaria==='si' ? 'SÍ' : 'NO',
+    w.pct_retencion||'',
+    w.fecha_firma||'',
+    w.fecha_registro||''
+  ]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+  // Anchos de columna
+  ws['!cols'] = [
+    {wch:6},{wch:12},{wch:28},{wch:12},{wch:20},
+    {wch:13},{wch:18},{wch:22},{wch:18},
+    {wch:14},{wch:20},{wch:14},{wch:14},
+    {wch:16},{wch:16},{wch:16},
+    {wch:18},{wch:10},{wch:16},{wch:14}
+  ];
+
+  // Fila de encabezado en negrita
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for(let c = range.s.c; c <= range.e.c; c++){
+    const cell = ws[XLSX.utils.encode_cell({r:0, c})];
+    if(cell) cell.s = {font:{bold:true}};
+  }
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Formularios');
+  XLSX.writeFile(wb, 'Modelo145_formularios_'+today+'.xlsx');
+}
+
 function switchTab(n){
   document.getElementById('tab-1').style.display = n===1?'block':'none';
   document.getElementById('tab-2').style.display = n===2?'block':'none';
