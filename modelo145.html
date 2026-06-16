@@ -513,7 +513,11 @@ async function generarPDF(){
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `Modelo145_${d.nif}_trabajador.pdf`;
+    const ap1dl = (document.getElementById('apellido1').value.trim()).toUpperCase();
+    const ap2dl = (document.getElementById('apellido2').value.trim()).toUpperCase();
+    const npiladl = (document.getElementById('nombre').value.trim()).toUpperCase();
+    const fechadl = new Date().toISOString().slice(0,10);
+    a.download = `${ap1dl} ${ap2dl} ${npiladl}_${fechadl} modelo 145.pdf`;
     a.click();
     URL.revokeObjectURL(url);
     btn.innerHTML = '✅ Descargado';
