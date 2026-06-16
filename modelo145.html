@@ -192,7 +192,12 @@
   <!-- TAB 2 -->
   <div class="panel" id="panel-2">
     <div class="card">
-      <div class="info-box"><span class="ico">ℹ️</span><div>Incluye hijos y otros descendientes menores de 25 años (o mayores con discapacidad ≥33%) que convivan contigo y cuyas rentas no superen <strong>8.000 €/año</strong>.</div></div>
+      <div class="info-box"><span class="ico">ℹ️</span><div>
+  Incluye en este apartado:<br><br>
+  <strong>Hijos</strong> menores de 25 años (o mayores con discapacidad ≥33%) que convivan contigo y cuyas rentas no superen <strong>8.000 €/año</strong>.<br><br>
+  <strong>Otros descendientes (nietos, bisnietos...)</strong> con los mismos requisitos de edad, convivencia y rentas.<br><br>
+  <strong>Acogimiento:</strong> Los menores en régimen de acogimiento familiar también computan como descendientes a efectos del mínimo, siempre que el acogimiento sea de carácter <strong>permanente o preadoptivo</strong> (no temporal).
+</div></div>
       <div class="sec-title">👶 Hijos y otros descendientes</div>
       <div id="hijos-container"><div class="empty-msg" id="hijos-empty">No has añadido descendientes. Pulsa el botón si corresponde.</div></div>
       <button class="btn-add-person" onclick="addHijo()">＋ Añadir hijo / descendiente</button>
@@ -232,7 +237,7 @@
       <div class="warn-box"><span class="ico">⚠️</span><div><strong>Solo para viviendas adquiridas antes del 1 de enero de 2013.</strong></div></div>
       <div class="info-box"><span class="ico">ℹ️</span><div>Si pagas hipoteca por tu vivienda habitual adquirida antes del 01/01/2013 y tu salario bruto total es <strong>inferior a 33.007,20 €/año</strong>, puedes marcar esta casilla.</div></div>
       <div class="sec-title">🏠 Deducción por vivienda habitual (pre-2013)</div>
-      <div class="check-row" id="cr-vivienda" onclick="toggleCheck('deduccion_vivienda','cr-vivienda')"><input type="checkbox" id="deduccion_vivienda"><div class="check-text">Cumplo los requisitos: adquirí mi vivienda habitual antes del 1/1/2013 con hipoteca, y mis retribuciones del trabajo son inferiores a 33.007,20 €/año</div></div>
+      <div class="check-row" id="cr-vivienda" onclick="toggleCheck('deduccion_vivienda','cr-vivienda')"><input type="checkbox" id="deduccion_vivienda"><div class="check-text">Cumplo los requisitos: adquirí o rehabilité mi vivienda habitual antes del 1/1/2013 con financiación ajena (hipoteca u otro préstamo), y mis retribuciones íntegras del trabajo son inferiores a 33.007,20 €/año</div></div>
     </div>
     <div class="nav"><button class="btn-back" onclick="goTab(4)">← Anterior</button><button class="btn-next" onclick="goTab(6)">Siguiente →</button></div>
   </div>
