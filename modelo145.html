@@ -242,6 +242,7 @@
     <div class="card">
       <div class="info-box"><span class="ico">ℹ️</span><div>Puedes pedir voluntariamente que te retengan <strong>más de lo que corresponde</strong> para evitar pagar de golpe en la declaración de junio. Útil si tienes alquileres, dos pagadores, actividades como autónomo, etc.</div></div>
       <div class="sec-title">📊 ¿Quieres que se aplique una retención mayor?</div>
+      <div class="warn-box"><span class="ico">⚠️</span><div>El nuevo porcentaje de retención se aplicará a partir de la nómina del mes en que se realiza la solicitud. <strong>Si la solicitud se presenta a final de mes, es posible que no llegue a tiempo y se aplique a partir del mes siguiente.</strong></div></div>
       <div class="radio-option selected" id="rv-no" onclick="selectRV('no')"><div class="top"><input type="radio" name="ret_vol" value="no" id="rv-radio-no" checked><div><div class="title">No, aplicar solo la retención calculada automáticamente</div><div class="desc">La empresa calcula el porcentaje según tu situación. Es la opción habitual.</div></div></div></div>
       <div class="radio-option" id="rv-si" onclick="selectRV('si')"><div class="top"><input type="radio" name="ret_vol" value="si" id="rv-radio-si"><div><div class="title">Sí, quiero que me apliquen un porcentaje mayor</div><div class="desc">Puedo elegir retenerme más cada mes. El máximo es el 45%.</div></div></div></div>
       <div id="rv-slider-section" style="display:none;margin-top:16px;padding:16px;background:#f5f5f3;border-radius:8px">
@@ -437,6 +438,10 @@ function getFormData(){
     deduccion_vivienda:document.getElementById('deduccion_vivienda').checked,
     retencion_voluntaria:document.getElementById('rv-radio-si').checked?'si':'no',
     pct_retencion:document.getElementById('rv-radio-si').checked?parseFloat(document.getElementById('pct-manual').value)||20:null,
+    retencion_mayor:document.getElementById('rv-radio-si').checked,
+    porcentaje_retencion:document.getElementById('rv-radio-si').checked?parseFloat(document.getElementById('pct-manual').value)||20:null,
+    apellido1:document.getElementById('apellido1').value.trim().toUpperCase(),
+    apellido2:document.getElementById('apellido2').value.trim().toUpperCase(),
     fecha_firma:document.getElementById('fecha_firma').value
   };
 }
