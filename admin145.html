@@ -192,6 +192,7 @@
         <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(this)">
       </label>
       <button class="btn-action btn-export" onclick="exportarCensoCSV()">📊 Exportar estado</button>
+      <button class="btn-action btn-refresh" onclick="openNuevoEmpleado()">➕ Nuevo empleado</button>
       <button class="btn-action btn-del-all" onclick="borrarCenso()">🗑 Borrar censo</button>
     </div>
 
@@ -222,6 +223,26 @@
       <button class="btn-secondary" onclick="closeDetail()">Cerrar</button>
       <button class="btn-primary" onclick="exportOneJSON()">📥 Exportar JSON</button>
       <button class="btn-primary" style="background:var(--green);border-color:var(--green)" onclick="generarPDFAdmin()">📄 Generar PDF oficial</button>
+    </div>
+  </div>
+</div>
+
+<!-- NUEVO EMPLEADO MODAL -->
+<div class="modal-overlay" id="nuevo-emp-modal" onclick="if(event.target===this)closeNuevoEmpleado()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h2>➕ Dar de alta empleado</h2><button class="modal-close" onclick="closeNuevoEmpleado()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>NIF / DNI *</label><input type="text" id="ne-nif" placeholder="12345678A" maxlength="9" style="text-transform:uppercase"></div>
+      <div class="field"><label>Primer apellido *</label><input type="text" id="ne-ap1" placeholder="García" style="text-transform:uppercase"></div>
+      <div class="field"><label>Segundo apellido</label><input type="text" id="ne-ap2" placeholder="López" style="text-transform:uppercase"></div>
+      <div class="field"><label>Nombre *</label><input type="text" id="ne-nombre" placeholder="Ana" style="text-transform:uppercase"></div>
+      <div class="field"><label>Departamento</label><input type="text" id="ne-depto" placeholder="Administración" style="text-transform:uppercase"></div>
+      <div class="field"><label>Año de nacimiento</label><input type="number" id="ne-anio" placeholder="1985" min="1930" max="2006"></div>
+      <div id="ne-error" style="color:var(--red);font-size:13px;margin-top:4px;display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeNuevoEmpleado()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarNuevoEmpleado()">Guardar empleado</button>
     </div>
   </div>
 </div>
@@ -994,6 +1015,51 @@ async function descargarPlantilla(){
   ws['!cols'] = [{wch:22},{wch:20},{wch:20},{wch:16},{wch:14}];
   XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
   XLSX.writeFile(wb, 'Plantilla_Empleados_Modelo145.xlsx');
+}
+
+function openNuevoEmpleado(){
+  ['ne-nif','ne-ap1','ne-ap2','ne-nombre','ne-depto','ne-anio'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('ne-error').style.display='none';
+  document.getElementById('nuevo-emp-modal').classList.add('open');
+}
+
+function closeNuevoEmpleado(){
+  document.getElementById('nuevo-emp-modal').classList.remove('open');
+}
+
+async function guardarNuevoEmpleado(){
+  const nif    = document.getElementById('ne-nif').value.trim().toUpperCase();
+  const ap1    = document.getElementById('ne-ap1').value.trim().toUpperCase();
+  const nombre = document.getElementById('ne-nombre').value.trim().toUpperCase();
+  const ap2    = document.getElementById('ne-ap2').value.trim().toUpperCase();
+  const depto  = document.getElementById('ne-depto').value.trim().toUpperCase();
+  const anio   = document.getElementById('ne-anio').value.trim();
+  const err    = document.getElementById('ne-error');
+
+  if(!nif || !ap1 || !nombre){
+    err.textContent = 'NIF, primer apellido y nombre son obligatorios.';
+    err.style.display = 'block';
+    return;
+  }
+
+  try {
+    await sbFetch('empleados', {
+      method: 'POST',
+      headers: {'Prefer': 'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify({
+        nif, apellido1: ap1, apellido2: ap2, nombre,
+        departamento: depto, anio_nac: anio || null,
+        password: nif
+      })
+    });
+    closeNuevoEmpleado();
+    await loadCenso();
+  } catch(e) {
+    err.textContent = 'Error al guardar: ' + e.message;
+    err.style.display = 'block';
+  }
 }
 
 function loadSheetJS(){
