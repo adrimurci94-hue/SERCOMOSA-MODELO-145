@@ -186,11 +186,6 @@
       <select id="censo-depto" onchange="filterCenso()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff">
         <option value="">Todos los departamentos</option>
       </select>
-      <button class="btn-action btn-export" onclick="descargarPlantilla()">📥 Descargar plantilla</button>
-      <label class="btn-action btn-export" style="cursor:pointer">
-        📂 Importar Excel
-        <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(this)">
-      </label>
       <button class="btn-action btn-export" onclick="exportarCensoCSV()">📊 Exportar estado</button>
       <button class="btn-action btn-refresh" onclick="openNuevoEmpleado()">➕ Nuevo empleado</button>
       <button class="btn-action btn-del-all" onclick="borrarCenso()">🗑 Borrar censo</button>
