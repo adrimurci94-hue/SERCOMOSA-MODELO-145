@@ -763,7 +763,7 @@ function compartirWhatsApp(){
 // Cargar datos del empleado desde el login
 (function(){
   const emp = sessionStorage.getItem('empleado');
-  if(!emp) return; // Si no hay sesión, el formulario queda en blanco
+  if(!emp){ window.location.href='login.html'; return; } // Si no hay sesión, redirigir al login
   const d = JSON.parse(emp);
   window.addEventListener('DOMContentLoaded', function(){
     if(d.nif)      { const el = document.getElementById('nif');      if(el) el.value = d.nif; }
