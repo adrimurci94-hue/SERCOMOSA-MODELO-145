@@ -97,7 +97,7 @@ async function login() {
   btn.innerHTML = '<span class="spinner"></span>Verificando...';
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/empleados?nif=eq.${encodeURIComponent(nif)}&select=nif,apellido1,apellido2,nombre,anio_nac,password`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/empleados?nif=eq.${encodeURIComponent(nif)}&select=nif,apellido1,apellido2,nombre,password`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -121,8 +121,7 @@ async function login() {
       nif: empleado.nif,
       apellido1: empleado.apellido1 || '',
       apellido2: empleado.apellido2 || '',
-      nombre: empleado.nombre || '',
-      anio_nac: empleado.anio_nac || ''
+      nombre: empleado.nombre || ''
     }));
 
     window.location.href = 'modelo145.html';
