@@ -343,9 +343,16 @@ function renderStats(){
   document.getElementById('stat-discap').textContent = allData.filter(w=>w.discapacidad!=='0').length;
 }
 
+function nombreCompleto(w){
+  if(w.apellido1||w.apellido2){
+    return ((w.apellido1||'')+' '+(w.apellido2||'')+' '+(w.nombre_pila||w.nombre||'')).trim();
+  }
+  return w.nombre||'—';
+}
+
 function filterTable(){
   const q=(document.getElementById('search-input').value||'').toLowerCase();
-  const filtered = allData.filter(w=>!q||(w.nombre||'').toLowerCase().includes(q)||(w.nif||'').toLowerCase().includes(q));
+  const filtered = allData.filter(w=>!q||nombreCompleto(w).toLowerCase().includes(q)||(w.nif||'').toLowerCase().includes(q));
   renderTable(filtered);
 }
 
@@ -362,7 +369,7 @@ function renderTable(data){
   document.getElementById('table-body').innerHTML = data.map(w=>{
     const hijosV = (w.hijos||[]).filter(h=>h.nac).length;
     return `<tr>
-    <td><strong>${w.nombre||'—'}</strong></td>
+    <td><strong>${nombreCompleto(w)}</strong></td>
     <td class="muted">${w.nif||'—'}</td>
     <td><span class="badge ${sfBadge(w.sit_familiar)}">${sfL[w.sit_familiar]||'—'}</span></td>
     <td class="muted">${hijosV||'—'}</td>
@@ -381,7 +388,7 @@ function openDetail(id){
   const w = allData.find(x=>x.id===id);
   if(!w) return;
   currentDetailRecord = w;
-  document.getElementById('detail-title').textContent = '📄 '+w.nombre;
+  document.getElementById('detail-title').textContent = '📄 '+nombreCompleto(w);
   const sfFull={'1':'Opción 1 — Familia monoparental','2':'Opción 2 — Cónyuge con rentas bajas','3':'Opción 3 — Resto de situaciones'};
   let hijosHtml='<div style="font-size:13px;color:var(--text3)">Ninguno declarado</div>';
   const hijosValidos = (w.hijos||[]).filter(h=>h.nac);
@@ -396,7 +403,7 @@ function openDetail(id){
   document.getElementById('detail-body').innerHTML=`
     <div class="section-sep">👤 Datos personales</div>
     <div class="detail-grid">
-      <div class="detail-card"><div class="dlbl">Nombre completo</div><div class="dval">${(w.nombre||'—').toUpperCase()}</div></div>
+      <div class="detail-card"><div class="dlbl">Nombre completo</div><div class="dval">${nombreCompleto(w).toUpperCase()}</div></div>
       <div class="detail-card"><div class="dlbl">NIF / NIE</div><div class="dval">${(w.nif||'—').toUpperCase()}</div></div>
       <div class="detail-card"><div class="dlbl">Año de nacimiento</div><div class="dval">${w.anio_nac||'—'}</div></div>
       <div class="detail-card"><div class="dlbl">Fecha comunicación</div><div class="dval">${w.fecha_firma||w.fecha_registro||'—'}</div></div>
@@ -807,8 +814,8 @@ function renderCenso(filtered){
   document.getElementById('censo-empty').style.display='none';
 
   document.getElementById('censo-body').innerHTML = data.map(e => {
-    const estado = getEstado(e.dni);
-    const registros = censoFormularios[(e.dni||'').toUpperCase()] || [];
+    const estado = getEstado(e.nif||e.dni);
+    const registros = censoFormularios[((e.nif||e.dni)||'').toUpperCase()] || [];
     const ultimaFecha = registros.length ? registros[registros.length-1].fecha_registro || '—' : '—';
     const badgeHtml = estado==='ok'
       ? '<span class="badge-ok">✅ Completado</span>'
@@ -821,11 +828,11 @@ function renderCenso(filtered){
       <td>${(e.apellido1||'—').toUpperCase()}</td>
       <td>${(e.apellido2||'—').toUpperCase()}</td>
       <td>${(e.nombre||'—').toUpperCase()}</td>
-      <td class="muted">${(e.dni||'—').toUpperCase()}</td>
+      <td class="muted">${((e.nif||e.dni)||'—').toUpperCase()}</td>
       <td>${badgeHtml}</td>
       <td class="muted">${ultimaFecha}</td>
       <td><div class="td-actions">
-        ${estado!=='pendiente'?`<button class="btn-tbl" onclick="verFormularioDni('${e.dni}')">👁 Ver</button>`:''}
+        ${estado!=='pendiente'?`<button class="btn-tbl" onclick="verFormularioDni('${e.nif||e.dni}')">👁 Ver</button>`:''}
       </div></td>
     </tr>`;
   }).join('');
@@ -835,7 +842,7 @@ function updateCensoStats(){
   const total = censoData.length;
   let ok=0, pend=0, mod=0;
   censoData.forEach(e => {
-    const est = getEstado(e.dni);
+    const est = getEstado(e.nif||e.dni);
     if(est==='ok') ok++;
     else if(est==='pendiente') pend++;
     else mod++;
@@ -858,9 +865,9 @@ function filterCenso(){
   const estado = document.getElementById('censo-filtro').value;
   const depto = document.getElementById('censo-depto').value;
   const filtered = censoData.filter(e => {
-    const matchQ = !q || [e.apellido1,e.apellido2,e.nombre,e.dni,e.departamento]
+    const matchQ = !q || [e.apellido1,e.apellido2,e.nombre,e.nif||e.dni,e.departamento]
       .some(v=>(v||'').toLowerCase().includes(q));
-    const matchEst = estado==='todos' || getEstado(e.dni)===estado;
+    const matchEst = estado==='todos' || getEstado(e.nif||e.dni)===estado;
     const matchDep = !depto || (e.departamento||'').toUpperCase()===depto;
     return matchQ && matchEst && matchDep;
   });
@@ -1002,11 +1009,11 @@ function exportarCensoCSV(){
   if(!censoData.length){alert('No hay datos en el censo.');return;}
   const headers=['Departamento','Apellido1','Apellido2','Nombre','DNI','Estado','Fecha_formulario'];
   const rows = censoData.map(e=>{
-    const estado = getEstado(e.dni);
-    const registros = censoFormularios[(e.dni||'').toUpperCase()]||[];
+    const estado = getEstado(e.nif||e.dni);
+    const registros = censoFormularios[((e.nif||e.dni)||'').toUpperCase()]||[];
     const fecha = registros.length ? registros[registros.length-1].fecha_registro||'' : '';
     const estadoTxt = estado==='ok'?'Completado':estado==='modificado'?'Modificado':'Pendiente';
-    return [e.departamento,e.apellido1,e.apellido2,e.nombre,e.dni,estadoTxt,fecha]
+    return [e.departamento,e.apellido1,e.apellido2,e.nombre,e.nif||e.dni,estadoTxt,fecha]
       .map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',');
   });
   const csv=[headers.join(','),...rows].join('\n');
