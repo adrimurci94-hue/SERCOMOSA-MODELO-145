@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acceso Empleados — SERCOMOSA</title>
+<style>
+  :root {
+    --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#85B7EB;
+    --green:#0F6E56;--green-light:#E1F5EE;--green-mid:#5DCAA5;
+    --amber:#854F0B;--amber-light:#FAEEDA;--amber-mid:#EF9F27;
+    --red:#A32D2D;--red-light:#FCEBEB;--red-mid:#F09595;
+    --border:#D3D1C7;--text:#1a1a1a;--text2:#555;--text3:#888;
+    --radius:10px;--shadow:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:var(--text);background:#f0ede8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+  .container{width:100%;max-width:420px}
+  .header{background:var(--blue);color:#fff;border-radius:var(--radius);padding:24px;margin-bottom:20px;text-align:center}
+  .header-icon{font-size:40px;margin-bottom:12px}
+  .header h1{font-size:20px;font-weight:600;margin-bottom:4px}
+  .header p{font-size:13px;opacity:0.85}
+  .card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+  .sec-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:5px}
+  .field input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;background:#fff;color:var(--text);transition:border-color 0.15s;text-transform:uppercase;letter-spacing:1px}
+  .field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,0.1)}
+  .field .note{font-size:12px;color:var(--text3);margin-top:4px}
+  .btn-login{width:100%;padding:13px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;transition:background 0.15s}
+  .btn-login:hover{background:#0C447C}
+  .btn-login:disabled{opacity:0.6;cursor:not-allowed}
+  .error-box{background:var(--red-light);border:1px solid var(--red-mid);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--red);display:none}
+  .info-box{background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#0C447C}
+  .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .footer{text-align:center;font-size:12px;color:var(--text3);margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-icon">🏢</div>
+    <h1>Portal del Empleado</h1>
+    <p>SERCOMOSA — Área de Personas y Comunicación</p>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🔐 Acceso al Modelo 145</div>
+
+    <div class="info-box">
+      Introduce tu <strong>NIF/DNI</strong> y como contraseña tu propio <strong>NIF/DNI</strong>. Si tienes problemas para acceder, contacta con el Área de Personas y Comunicación.
+    </div>
+
+    <div class="error-box" id="error-box">
+      NIF/DNI o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.
+    </div>
+
+    <div class="field">
+      <label>NIF / DNI *</label>
+      <input type="text" id="input-nif" placeholder="12345678A" maxlength="9" autocomplete="username">
+      <div class="note">8 dígitos + letra (DNI) o X/Y/Z + dígitos + letra (NIE)</div>
+    </div>
+
+    <div class="field">
+      <label>Contraseña *</label>
+      <input type="password" id="input-pwd" placeholder="••••••••••" autocomplete="current-password" style="text-transform:none;letter-spacing:2px">
+      <div class="note">Tu contraseña inicial es tu propio NIF/DNI</div>
+    </div>
+
+    <button class="btn-login" id="btn-login" onclick="login()">Entrar</button>
+  </div>
+
+  <div class="footer">SERCOMOSA © 2026 — Uso interno</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ygmsyilgdyzhthnioapo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ajnT1czWqXnb4sVVed37nQ_JP8UZBss';
+
+async function login() {
+  const nif = document.getElementById('input-nif').value.trim().toUpperCase();
+  const pwd = document.getElementById('input-pwd').value.trim().toUpperCase();
+  const btn = document.getElementById('btn-login');
+  const err = document.getElementById('error-box');
+
+  err.style.display = 'none';
+
+  if (!nif || !pwd) {
+    err.textContent = 'Por favor, introduce tu NIF/DNI y contraseña.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Verificando...';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/empleados?nif=eq.${encodeURIComponent(nif)}&select=nif,apellido1,apellido2,nombre,anio_nac,password`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const empleado = data[0];
+
+    if (empleado.password.toUpperCase() !== pwd) {
+      throw new Error('Contraseña incorrecta');
+    }
+
+    // Login correcto — guardar datos en sessionStorage y redirigir
+    sessionStorage.setItem('empleado', JSON.stringify({
+      nif: empleado.nif,
+      apellido1: empleado.apellido1 || '',
+      apellido2: empleado.apellido2 || '',
+      nombre: empleado.nombre || '',
+      anio_nac: empleado.anio_nac || ''
+    }));
+
+    window.location.href = 'modelo145.html';
+
+  } catch (e) {
+    err.textContent = 'NIF/DNI o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'Entrar';
+  }
+}
+
+// Permitir Enter para hacer login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>

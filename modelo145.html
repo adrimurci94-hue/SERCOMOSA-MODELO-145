@@ -759,5 +759,20 @@ function compartirWhatsApp(){
   window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 }
 </script>
+<script>
+// Cargar datos del empleado desde el login
+(function(){
+  const emp = sessionStorage.getItem('empleado');
+  if(!emp) return; // Si no hay sesión, el formulario queda en blanco
+  const d = JSON.parse(emp);
+  window.addEventListener('DOMContentLoaded', function(){
+    if(d.nif)      { const el = document.getElementById('nif');      if(el) el.value = d.nif; }
+    if(d.apellido1){ const el = document.getElementById('apellido1'); if(el) el.value = d.apellido1; }
+    if(d.apellido2){ const el = document.getElementById('apellido2'); if(el) el.value = d.apellido2; }
+    if(d.nombre)   { const el = document.getElementById('nombre');    if(el) el.value = d.nombre; }
+    if(d.anio_nac) { const el = document.getElementById('anio_nac'); if(el) el.value = d.anio_nac; }
+  });
+})();
+</script>
 </body>
 </html>
