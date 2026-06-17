@@ -55,8 +55,8 @@
   .check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color 0.15s}
   .check-row:hover{border-color:var(--blue-mid)}
   .check-row.checked{border-color:var(--blue);background:var(--blue-light)}
-  .check-row input[type=checkbox]{margin-top:3px;flex-shrink:0;accent-color:var(--blue);pointer-events:none}
-  .radio-option input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--blue);pointer-events:none}
+  .check-row input[type=checkbox]{margin-top:3px;flex-shrink:0;accent-color:var(--blue);cursor:pointer}
+  .radio-option input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--blue);cursor:pointer}
   .check-row .check-text{font-size:13px;color:var(--text);line-height:1.5}
   .person-card{background:#f5f5f3;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid var(--border)}
   .person-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -149,7 +149,7 @@
       <div class="sec-title">🗺️ Movilidad geográfica</div>
       <div class="info-box"><span class="ico">ℹ️</span><div>Si estabas en el paro (inscrito en el SEPE) y al aceptar este empleo tuviste que <strong>mudarte a otro municipio</strong>, tienes derecho a una reducción adicional en la retención durante los 2 primeros años.</div></div>
       <div class="check-row" id="cr-movilidad" onclick="toggleCheck('movilidad','cr-movilidad');toggleMovilidad()">
-        <input type="checkbox" id="movilidad"><div class="check-text">Vine del desempleo y tuve que cambiar de municipio para aceptar este puesto</div>
+        <input type="checkbox" id="movilidad" onclick="cbClick('movilidad','cr-movilidad',event)"><div class="check-text">Vine del desempleo y tuve que cambiar de municipio para aceptar este puesto</div>
       </div>
       <div id="movilidad-fecha-div" style="display:none"><div class="field"><label>Fecha del traslado</label><input type="date" id="movilidad_fecha"></div></div>
     </div>
@@ -157,7 +157,7 @@
       <div class="sec-title">📈 Rendimientos irregulares (últimos 5 años)</div>
       <div class="info-box"><span class="ico">ℹ️</span><div>Marca esta casilla solo si en los últimos 5 años cobraste una indemnización plurianual o bonus acumulado al que se aplicó la <strong>reducción del 30%</strong>, pero luego <strong>no usaste esa reducción</strong> en tu declaración. Si tienes dudas, déjala sin marcar.</div></div>
       <div class="check-row" id="cr-rend-irr" onclick="toggleCheck('rend_irr','cr-rend-irr')">
-        <input type="checkbox" id="rend_irr"><div class="check-text">Percibí rendimientos con generación &gt;2 años con reducción aplicada que no usé en mi autoliquidación</div>
+        <input type="checkbox" id="rend_irr" onclick="cbClick('rend_irr','cr-rend-irr',event)"><div class="check-text">Percibí rendimientos con generación &gt;2 años con reducción aplicada que no usé en mi autoliquidación</div>
       </div>
     </div>
     <div class="nav"><span></span><button class="btn-next" onclick="goTab(1)">Siguiente →</button></div>
@@ -184,7 +184,7 @@
         </select>
       </div>
       <div id="discap-movilidad-div" style="display:none">
-        <div class="check-row" id="cr-discap-mov" onclick="toggleCheck('discap_mov','cr-discap-mov')"><input type="checkbox" id="discap_mov"><div class="check-text">Además, tengo acreditada necesidad de ayuda de terceras personas o movilidad reducida</div></div>
+        <div class="check-row" id="cr-discap-mov" onclick="toggleCheck('discap_mov','cr-discap-mov')"><input type="checkbox" id="discap_mov" onclick="cbClick('discap_mov','cr-discap-mov',event)"><div class="check-text">Además, tengo acreditada necesidad de ayuda de terceras personas o movilidad reducida</div></div>
       </div>
     </div>
     <div class="nav"><button class="btn-back" onclick="goTab(0)">← Anterior</button><button class="btn-next" onclick="goTab(2)">Siguiente →</button></div>
@@ -238,7 +238,7 @@
       <div class="warn-box"><span class="ico">⚠️</span><div><strong>Solo para viviendas adquiridas antes del 1 de enero de 2013.</strong></div></div>
       <div class="info-box"><span class="ico">ℹ️</span><div>Si pagas hipoteca por tu vivienda habitual adquirida antes del 01/01/2013 y tu salario bruto total es <strong>inferior a 33.007,20 €/año</strong>, puedes marcar esta casilla.</div></div>
       <div class="sec-title">🏠 Deducción por vivienda habitual (pre-2013)</div>
-      <div class="check-row" id="cr-vivienda" onclick="toggleCheck('deduccion_vivienda','cr-vivienda')"><input type="checkbox" id="deduccion_vivienda"><div class="check-text">Cumplo los requisitos: adquirí o rehabilité mi vivienda habitual antes del 1/1/2013 con financiación ajena (hipoteca u otro préstamo), y mis retribuciones íntegras del trabajo son inferiores a 33.007,20 €/año</div></div>
+      <div class="check-row" id="cr-vivienda" onclick="toggleCheck('deduccion_vivienda','cr-vivienda')"><input type="checkbox" id="deduccion_vivienda" onclick="cbClick('deduccion_vivienda','cr-vivienda',event)"><div class="check-text">Cumplo los requisitos: adquirí o rehabilité mi vivienda habitual antes del 1/1/2013 con financiación ajena (hipoteca u otro préstamo), y mis retribuciones íntegras del trabajo son inferiores a 33.007,20 €/año</div></div>
     </div>
     <div class="nav"><button class="btn-back" onclick="goTab(4)">← Anterior</button><button class="btn-next" onclick="goTab(6)">Siguiente →</button></div>
   </div>
@@ -284,7 +284,7 @@
         <div class="sec-title">✍️ Declaración y firma</div>
         <div class="info-box"><span class="ico">ℹ️</span><div>Al confirmar, manifiestas que eres contribuyente del IRPF y que los datos son ciertos, conforme al Art. 88 del Reglamento del IRPF.</div></div>
         <div class="error-box" id="send-error">❌ Error al enviar los datos. Comprueba tu conexión e inténtalo de nuevo.</div>
-        <div class="check-row" id="cr-declara" onclick="toggleCheck('declara','cr-declara');checkDeclaracion()"><input type="checkbox" id="declara"><div class="check-text"><strong>Declaro que soy contribuyente del IRPF y que los datos comunicados son ciertos.</strong></div></div>
+        <div class="check-row" id="cr-declara" onclick="toggleCheck('declara','cr-declara');checkDeclaracion()"><input type="checkbox" id="declara" onclick="cbClick('declara','cr-declara',event)"><div class="check-text"><strong>Declaro que soy contribuyente del IRPF y que los datos comunicados son ciertos.</strong></div></div>
         <div class="field"><label>Fecha de la comunicación</label><input type="date" id="fecha_firma" readonly style="background:#f5f5f3;cursor:not-allowed;color:var(--text2)"><div class="note">Fecha generada automáticamente — no modificable</div></div>
         <button class="btn-next" id="btn-enviar" style="width:100%;opacity:0.4;cursor:not-allowed" disabled onclick="enviarFormulario()">📨 Confirmar y enviar a Recursos Humanos</button>
       </div>
@@ -342,7 +342,15 @@ function goTab(n){
   if(n===7) buildSummary();
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function toggleCheck(id,rowId){const cb=document.getElementById(id);cb.checked=!cb.checked;document.getElementById(rowId).classList.toggle('checked',cb.checked);}
+function toggleCheck(id,rowId,fromCb){
+  const cb=document.getElementById(id);
+  if(!fromCb) cb.checked=!cb.checked;
+  document.getElementById(rowId).classList.toggle('checked',cb.checked);
+}
+function cbClick(id,rowId,e){
+  e.stopPropagation();
+  document.getElementById(rowId).classList.toggle('checked',document.getElementById(id).checked);
+}
 function toggleMovilidad(){document.getElementById('movilidad-fecha-div').style.display=document.getElementById('movilidad').checked?'block':'none';}
 function toggleDiscap(){document.getElementById('discap-movilidad-div').style.display=document.getElementById('discapacidad').value!=='0'?'block':'none';}
 function selectSF(n){[1,2,3].forEach(i=>{document.getElementById('sf-'+i).classList.toggle('selected',i===n);document.querySelector('#sf-'+i+' input[type=radio]').checked=i===n;});document.getElementById('nif-conyuge-div').style.display=n===2?'block':'none';}
@@ -361,9 +369,9 @@ function addHijo(){
     <div class="field"><label>Discapacidad</label><select id="h${id}_disc" onchange="toggleDiscapHijo(${id})"><option value="0">Sin discapacidad</option><option value="33">≥33% e &lt;65%</option><option value="65">≥65%</option></select></div>
   </div>
   <div id="cr-h${id}-ayuda-div" style="display:none">
-    <div class="check-row" id="cr-h${id}-ayuda" onclick="toggleCheck('h${id}_ayuda','cr-h${id}-ayuda')"><input type="checkbox" id="h${id}_ayuda"><div class="check-text">Además, tiene acreditada la necesidad de ayuda de terceras personas o movilidad reducida</div></div>
+    <div class="check-row" id="cr-h${id}-ayuda" onclick="toggleCheck('h${id}_ayuda','cr-h${id}-ayuda')"><input type="checkbox" id="h${id}_ayuda" onclick="cbClick('h${id}_ayuda','cr-h${id}-ayuda',event)"><div class="check-text">Además, tiene acreditada la necesidad de ayuda de terceras personas o movilidad reducida</div></div>
   </div>
-  <div class="check-row" id="cr-h${id}-excl" onclick="toggleCheck('h${id}_excl','cr-h${id}-excl')"><input type="checkbox" id="h${id}_excl"><div class="check-text">Convive <strong>únicamente</strong> conmigo, sin convivir también con el otro progenitor</div></div>`;
+  <div class="check-row" id="cr-h${id}-excl" onclick="toggleCheck('h${id}_excl','cr-h${id}-excl')"><input type="checkbox" id="h${id}_excl" onclick="cbClick('h${id}_excl','cr-h${id}-excl',event)"><div class="check-text">Convive <strong>únicamente</strong> conmigo, sin convivir también con el otro progenitor</div></div>`;
   document.getElementById('hijos-container').appendChild(d);
 }
 function toggleDiscapHijo(id){
