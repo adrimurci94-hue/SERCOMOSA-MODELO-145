@@ -25,7 +25,7 @@
   .progress-bar .step.done{background:var(--green-mid)}
   .progress-bar .step.active{background:var(--blue)}
   .progress-label{font-size:12px;color:var(--text3);margin-bottom:16px;text-align:right}
-  .tabs-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}
+  .tabs-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding-left:2px;padding-right:2px}
   .tabs-scroll::-webkit-scrollbar{display:none}
   .tab-btn{white-space:nowrap;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.15s;flex-shrink:0;font-family:inherit}
   .tab-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
@@ -335,7 +335,7 @@ document.getElementById('fecha_firma').value = new Date().toISOString().slice(0,
 
 function goTab(n){
   document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n));
-  document.querySelectorAll('.tab-btn').forEach((t,i)=>{t.classList.remove('active','done');if(i===n)t.classList.add('active');else if(i<n)t.classList.add('done');});
+  document.querySelectorAll('.tab-btn').forEach((t,i)=>{t.classList.remove('active','done');if(i===n){t.classList.add('active');t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}else if(i<n)t.classList.add('done');});
   document.querySelectorAll('[id^=ps]').forEach((s,i)=>{s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
   document.getElementById('prog-label').textContent='Paso '+(n+1)+' de 8';
   if(n===7) buildSummary();
