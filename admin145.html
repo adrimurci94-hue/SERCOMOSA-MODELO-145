@@ -797,7 +797,8 @@ async function loadCenso(){
 }
 
 function getEstado(dni){
-  const registros = censoFormularios[(dni||'').toUpperCase()] || [];
+  if(!dni) return 'pendiente';
+  const registros = censoFormularios[dni.toUpperCase()] || [];
   if(registros.length === 0) return 'pendiente';
   if(registros.length > 1)  return 'modificado';
   return 'ok';
