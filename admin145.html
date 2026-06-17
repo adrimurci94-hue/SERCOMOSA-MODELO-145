@@ -112,7 +112,8 @@
     </div>
     <div class="login-error" id="login-error">Usuario o contraseña incorrectos.</div>
     <div class="field"><label>Usuario</label><input type="text" id="login-user" placeholder="Introduce tu usuario" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="Introduce tu contraseña" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="Introduce tu contraseña" onkeydown="if(event.key==='Enter')doLogin()" onkeyup="checkCapsLockAdmin(event)">
+    <div id="caps-warn-admin" style="display:none;margin-top:6px;background:#FAEEDA;border:1px solid #EF9F27;border-radius:6px;padding:7px 10px;font-size:12px;color:#854F0B">⚠️ Bloq Mayús activado — la contraseña distingue mayúsculas y minúsculas</div></div>
     <button class="btn-login" onclick="doLogin()">Acceder al panel →</button>
     <div class="warn-box" style="margin-top:20px;padding:10px 14px;font-size:12px">
       ⚠️ <strong>Credenciales por defecto:</strong> usuario <code>admin</code> · contraseña <code>rrhh2025</code><br>
@@ -287,6 +288,15 @@ async function sbFetch(path, options={}) {
 // ===== AUTH =====
 const DEFAULT_CREDS = {user:'admin', pass:'rrhh2025'};
 function getCreds(){try{return JSON.parse(localStorage.getItem('mod145_admin_creds')||'null')||DEFAULT_CREDS;}catch(e){return DEFAULT_CREDS;}}
+
+function checkCapsLockAdmin(e){
+  const warn = document.getElementById('caps-warn-admin');
+  if(e.getModifierState && e.getModifierState('CapsLock')){
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+}
 
 function doLogin(){
   const u=document.getElementById('login-user').value.trim();

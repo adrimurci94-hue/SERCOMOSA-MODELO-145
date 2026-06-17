@@ -65,8 +65,9 @@
 
     <div class="field">
       <label>Contraseña *</label>
-      <input type="password" id="input-pwd" placeholder="••••••••••" autocomplete="current-password" style="text-transform:none;letter-spacing:2px">
+      <input type="password" id="input-pwd" placeholder="••••••••••" autocomplete="current-password" style="letter-spacing:2px" onkeyup="checkCapsLock(event)">
       <div class="note">Tu contraseña inicial es tu propio NIF/DNI</div>
+      <div id="caps-warn" style="display:none;margin-top:6px;background:#FAEEDA;border:1px solid #EF9F27;border-radius:6px;padding:7px 10px;font-size:12px;color:#854F0B">⚠️ Bloq Mayús activado — la contraseña distingue mayúsculas y minúsculas</div>
     </div>
 
     <button class="btn-login" id="btn-login" onclick="login()">Entrar</button>
@@ -80,8 +81,8 @@ const SUPABASE_URL = 'https://ygmsyilgdyzhthnioapo.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnbXN5aWxnZHl6aHRobmlvYXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzI3NTMsImV4cCI6MjA5NjcwODc1M30.eM1-z1dhwVHttrTu2KG5NGHyC2i_8DFG1-bIHxfiXuw';
 
 async function login() {
-  const nif = document.getElementById('input-nif').value.trim().toUpperCase();
-  const pwd = document.getElementById('input-pwd').value.trim().toUpperCase();
+  const nif = document.getElementById('input-nif').value.trim().toUpperCase(); // NIF siempre en mayúsculas
+  const pwd = document.getElementById('input-pwd').value.trim(); // Contraseña sensible a mayúsculas
   const btn = document.getElementById('btn-login');
   const err = document.getElementById('error-box');
 
@@ -112,7 +113,7 @@ async function login() {
 
     const empleado = data[0];
 
-    if (empleado.password.toUpperCase() !== pwd) {
+    if (empleado.password !== pwd) {
       throw new Error('Contraseña incorrecta');
     }
 
@@ -132,6 +133,15 @@ async function login() {
     err.style.display = 'block';
     btn.disabled = false;
     btn.innerHTML = 'Entrar';
+  }
+}
+
+function checkCapsLock(e){
+  const warn = document.getElementById('caps-warn');
+  if(e.getModifierState && e.getModifierState('CapsLock')){
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
   }
 }
 
